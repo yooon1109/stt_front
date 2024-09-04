@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -10,23 +11,11 @@ import { Typography } from '@mui/material';
 // import ExpandLess from '@mui/icons-material/ExpandLess';
 // import ExpandMore from '@mui/icons-material/ExpandMore';
 
-const ListComponent = ({items, month}) => {
-
-  // 여러 상태를 관리하기 위해 객체 형태로 확장/축소 상태를 관리
-  const [openItems, setOpenItems] = React.useState({});
-
-  const handleClick = (index) => {
-    setOpenItems((prevOpenItems) => ({
-      ...prevOpenItems,
-      [index]: !prevOpenItems[index],
-    }));
-  };
-
+const ListComponent = ({items, month, onItemSelect }) => {
   const renderListItems = (items) => {
     return items.map((item, index) => (
       <Card key={index} sx={{ marginLeft: 4, marginRight: 4 }}>
-     
-        <ListItemButton onClick={() => item.nestedItems && handleClick(index)}>
+        <ListItemButton onClick={() => onItemSelect(item.id)}>
           <ListItemIcon>{item.icon}</ListItemIcon>
           <ListItemText 
           primary={item.label} 
