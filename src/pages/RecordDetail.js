@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { fetchRecordDetail } from 'apis/RecordApi';
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { fetchRecordDetail } from "apis/RecordApi";
 
 const DetailPage = () => {
   const { id } = useParams();
@@ -38,20 +38,25 @@ const DetailPage = () => {
   const spkToSpeaker = (spk) => {
     return speakers[spk] || `Speaker ${spk}`; // 기본값 처리
   };
-  
+
   return (
     <div>
       <h1>Record Detail</h1>
       {record ? (
         <div>
-        <Link to={`/edit/${id}`}><button>Edit</button></Link>
+          <Link to={`/edit/${id}`}>
+            <button>Edit</button>
+          </Link>
           <p>ID: {record.id}</p>
           <p>Title: {record.title}</p>
-          <p>Description: {recordTextList.map((item, index) => (
-          <div key={index}>
-            <strong>{spkToSpeaker(item.spk)}:</strong> {item.msg}
+          <div>
+            Description:{" "}
+            {recordTextList.map((item, index) => (
+              <div key={index}>
+                <strong>{spkToSpeaker(item.spk)}:</strong> {item.msg}
+              </div>
+            ))}
           </div>
-        ))}</p>
           {/* 필요한 다른 데이터들도 추가적으로 렌더링 */}
         </div>
       ) : (
@@ -60,6 +65,5 @@ const DetailPage = () => {
     </div>
   );
 };
-
 
 export default DetailPage;

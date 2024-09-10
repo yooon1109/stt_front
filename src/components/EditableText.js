@@ -10,30 +10,32 @@ const EditableText = ({ spk, msg, onMsgChange, spkToSpeaker, onEnterPress }) => 
         }
       };
 
-    return (
-      <div style={{ display: 'inline',  marginBottom: '10px' }}>
-        <strong style={{ display: 'flex', alignItems: 'center' }}>
-          <Input
-            value={spkToSpeaker(spk)}
-            sx={{
-              width: `${spk.length * 12}px`, // 스피커 ID 길이에 따른 폭 조정
-              minWidth: '200px',
-              boxSizing: 'border-box'
-            }}
-          />:
-        </strong>
-        <Input
-          color="neutral"
-          value={msg}
-          onChange={(e) => onMsgChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          sx={{
-            width: `${msg.length * 12}px`, // 메시지 길이에 따른 폭 조정
-            minWidth: '200px',
-            boxSizing: 'border-box'
-          }}
-        />
-      </div>
+      return (
+        <div className="inline-block mb-2.5">
+            <div className="flex items-center">
+                <Input
+                    value={spkToSpeaker(spk)}
+                    sx={{
+                        width: `${spk.length * 12}px`, // 스피커 ID 길이에 따른 폭 조정
+                        minWidth: '200px',
+                        boxSizing: 'border-box',
+                        fontWeight: '800'
+                    }}
+                />
+                <div className="font-bold mx-2.5">:</div>
+                <Input
+                    color="neutral"
+                    value={msg}
+                    onChange={(e) => onMsgChange(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    sx={{
+                        width: `${msg.length * 12}px`, // 메시지 길이에 따른 폭 조정
+                        minWidth: '200px',
+                        boxSizing: 'border-box'
+                    }}
+                />
+            </div>
+        </div>
     );
   };
 
