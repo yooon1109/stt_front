@@ -10,7 +10,7 @@ const StyledChip = styled(Chip)(({ theme }) => ({
     theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "#faf5ff",
   border: `1px solid ${theme.palette.mode === "dark" ? "#303030" : "#e8e8e8"}`,
   borderRadius: 2,
-  padding: "0 4px 0 10px",
+  padding: "0 4px 0 8px",
   boxSizing: "content-box",
   outline: 0,
   overflow: "hidden",

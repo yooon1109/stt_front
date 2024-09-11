@@ -27,7 +27,7 @@ const DialogComponent = ({ open, onClose }) => {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
   const [speaker, setSpeaker] = useState("");
-  const [isUnknown, setIsUnknown] = useState(true);
+  const [isUnknown, setIsUnknown] = useState(false);
   const [chipData, setChipData] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,6 +68,7 @@ const DialogComponent = ({ open, onClose }) => {
     setFileName("");
     setTitle("");
     setSpeaker("");
+    setIsUnknown(false);
   };
 
   const handleConfirm = async () => {
@@ -192,46 +193,60 @@ const DialogComponent = ({ open, onClose }) => {
             </div>
           </div>
           <div style={{ margin: "10px" }}>
-            <div>
-              <Typography variant="body1">대화 참여자 이름</Typography>
-              <TextField
-                autoComplete="off"
-                id="outlined-basic"
-                variant="standard"
-                size="small"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                sx={{ width: "80px" }}
-                disabled={isUnknown}
-              />
+            <Typography variant="body1">대화 참여자 이름</Typography>
+
+            <Box
+              component="section"
+              sx={{
+                maxHeight: "60px",
+                display: "flex",
+                gap: 1,
+                padding: "10px",
+                marginTop: "10px",
+                border: "1px solid #9ca3af",
+                borderRadius: 2,
+                alignItems: "center",
+                overflowX: "auto",
+                overflowY: "hidden",
+                whiteSpace: "nowrap",
+                "&::-webkit-scrollbar": {
+                  height: "2px",
+                },
+              }}
+            >
               <div
                 style={{
-                  maxHeight: "100px",
-                  overflowX: "hidden",
-                  overflowY: "auto",
-                  marginTop: "10px",
+                  display: "flex",
+                  flexWrap: "nowrap",
+                  alignItems: "center",
                 }}
               >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 1,
-                    padding: "10px",
+                {chipData.map((data, index) => (
+                  <StyledChip
+                    key={index}
+                    label={data}
+                    onDelete={handleDelete(data)} // 삭제 버튼 클릭 시 Chip 제거
+                    deleteIcon={<CloseIcon />}
+                  />
+                ))}
+                <input
+                  type="text"
+                  autoComplete="off"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  disabled={isUnknown}
+                  style={{
+                    outline: "none",
+                    paddingLeft: "6px",
+                    height: 20,
+                    width: 100,
+                    margin: "2px",
+                    caretColor: "#9ca3af",
                   }}
-                >
-                  {chipData.map((data, index) => (
-                    <StyledChip
-                      key={index}
-                      label={data}
-                      onDelete={handleDelete(data)} // 삭제 버튼 클릭 시 Chip 제거
-                      deleteIcon={<CloseIcon />}
-                    />
-                  ))}
-                </Box>
+                />
               </div>
-            </div>
+            </Box>
           </div>
         </div>
       </DialogContent>

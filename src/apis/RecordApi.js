@@ -24,6 +24,25 @@ export const fetchRecordDetail = async (id) => {
     }
 
     const data = await response.json();
+
+    if (data.fileData) {
+      // Base64 디코딩
+      const byteCharacters = atob(data.fileData); // Base64로 인코딩된 데이터 디코딩
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+
+      // Blob으로 변환
+      const blob = new Blob([byteArray], { type: "audio/mpeg" });
+
+      // Blob을 URL로 변환
+      const url = URL.createObjectURL(blob);
+
+      data.fileData = url;
+    }
+
     return data;
   } catch (error) {
     throw error;

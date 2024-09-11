@@ -8,9 +8,13 @@
 } */
 
 * {
-    font-family: "Nanum Gothic" , sans-serif;;
-  }
+  font-family: "Noto Sans KR", "Nanum Gothic", sans-serif;
+}
 
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+.scrollbar-thin-custom::-webkit-scrollbar {
+  width: 2px;
+}
