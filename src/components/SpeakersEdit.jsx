@@ -50,11 +50,27 @@ const SpeakersEdit = React.memo(({ open, onClose, speakers }) => {
     onClose(tempValues);
   }, [onClose, tempValues]);
 
+  const handleReorder = useCallback((newList) => {
+    setSpkList(newList);
+    setTempValues(newList);
+  }, []);
+
+  const handleBlur = useCallback(
+    (index) => () => {
+      setSpkList((prevList) => {
+        const updatedList = [...prevList];
+        updatedList[index] = tempValues[index];
+        return updatedList;
+      });
+    },
+    [tempValues]
+  );
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>참여자들</DialogTitle>
       <DialogContent>
-        <Reorder.Group axis="y" values={spkList} onReorder={setSpkList}>
+        <Reorder.Group axis="y" values={spkList} onReorder={handleReorder}>
           {spkList.map((item, index) => (
             <Reorder.Item key={item} value={item}>
               <div className="flex gap-2 items-center">
@@ -66,6 +82,7 @@ const SpeakersEdit = React.memo(({ open, onClose, speakers }) => {
                   onChange={handleChange(index)}
                   variant="outlined"
                   size="small"
+                  onBlur={handleBlur(index)}
                 />
                 <IconButton onClick={() => handleDelete(index)}>
                   <DeleteIcon fontSize="small" />
