@@ -34,7 +34,7 @@ const Player = ({ audioSrc, recordName }) => {
   };
 
   return (
-    <div className="audio-player p-8 m-8 mb-0">
+    <div className="audio-player pt-6 pr-8 pl-8 pb-6 mt-6 ml-2 mr-2 mb-0">
       <audio
         ref={audioRef}
         src={audioSrc}

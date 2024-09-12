@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { fetchRecordDetail } from "apis/RecordApi";
 import Toolbar from "components/Toolbar";
 import Player from "components/Player";
-import Description from "components/DescriptionEdit";
+import Description from "components/Description";
 
 const DetailPage = () => {
   const { id } = useParams();
@@ -60,23 +60,6 @@ const DetailPage = () => {
     return speakers[spk] || `Speaker ${spk}`; // 기본값 처리
   };
 
-  const handleMsgChange = (index, newMsg) => {
-    setRecordText((prevMessages) =>
-      prevMessages.map((item, i) =>
-        i === index ? { ...item, msg: newMsg } : item
-      )
-    );
-  };
-
-  const handleSpeakerChange = (index, newSpeaker) => {
-    setRecordText((prevMessages) =>
-      prevMessages.map((item, i) =>
-        i === index ? { ...item, spk: newSpeaker } : item
-      )
-    );
-    console.log(recordText);
-  };
-
   return (
     <div className="h-screen overflow-hidden flex flex-col">
       <Toolbar />
@@ -84,11 +67,16 @@ const DetailPage = () => {
 
       {/* 오디오 플레이어 */}
       {audioUrl && <Player audioSrc={audioUrl} recordName={recordName} />}
+      <div className="ml-6 mr-6 pr-4 w-[100hv] text-right">
+        참여자들 : {speakers.join(", ")}
+      </div>
       {record ? (
         <div className="flex flex-col flex-1 overflow-hidden">
-          {/* <Link to={`/edit/${id}`}>
-            <button>Edit</button>
-          </Link> */}
+          <div>
+            <Link to={`/edit/${id}`}>
+              <button>수정</button>
+            </Link>
+          </div>
           <div className="flex flex-col flex-1 border border-gray-400 p-4 m-6 rounded-[20px] h-[55vh]">
             <div className="m-2 overflow-y-auto scrollbar-thin-custom">
               <div>
@@ -98,11 +86,6 @@ const DetailPage = () => {
                     speaker={spkToSpeaker(item.spk)}
                     msg={item.msg}
                     color={colors[item.spk]}
-                    onMsgChange={(newMsg) => handleMsgChange(index, newMsg)}
-                    speakers={speakers}
-                    onSpeakerChange={(newSpeaker) =>
-                      handleSpeakerChange(index, newSpeaker)
-                    }
                   />
                 ))}
               </div>

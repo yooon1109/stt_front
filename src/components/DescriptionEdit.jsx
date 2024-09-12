@@ -1,4 +1,7 @@
+import { Button } from "@mui/material";
 import React, { useRef, useEffect } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
 
 const DescriptionEdit = ({
   speaker,
@@ -7,6 +10,8 @@ const DescriptionEdit = ({
   onMsgChange,
   speakers,
   onSpeakerChange,
+  onEnterPress,
+  onClickDelete,
 }) => {
   const textareaRef = useRef(null);
 
@@ -18,16 +23,30 @@ const DescriptionEdit = ({
     }
   }, [msg]);
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // 기본 엔터키 동작 방지
+      onEnterPress();
+    }
+  };
+
+  const handleDelete = (e) => {
+    onClickDelete();
+  };
+
   return (
     <div className="p-4 mb-2rounded-md shadow-sm flex items-center">
       <div className="flex-shrink-0">
+        <IconButton aria-label="delete" size="small">
+          <DeleteIcon fontSize="inherit" onClick={handleDelete} />
+        </IconButton>
         <select
           className={`text-lg ${color} bg-transparent border-none outline-none`}
           value={speaker}
-          onChange={(e) => onSpeakerChange(e.target.value)}
+          onChange={(e) => onSpeakerChange(e.target.selectedIndex)}
         >
           {speakers.map((spk, index) => (
-            <option key={index} value={spk}>
+            <option key={index} value={spk} className="text-gray-500">
               {spk}
             </option>
           ))}
@@ -41,6 +60,7 @@ const DescriptionEdit = ({
             value={msg}
             className="w-full p-2 border-none outline-none bg-transparent resize-none"
             onChange={(e) => onMsgChange(e.target.value)}
+            onKeyDown={handleKeyDown}
             rows={1}
           />
         </div>
