@@ -2,7 +2,7 @@
   "name": "stt_front",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8081",
+  "proxy": "http://52.79.215.156:8081",
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -23,6 +23,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.1",
     "react-scripts": "5.0.1",
+    "react-voice-visualizer": "^2.0.2",
     "tailwind-scrollbar": "^3.1.0",
     "web-vitals": "^2.1.4"
   },

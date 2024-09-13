@@ -79,3 +79,34 @@ export const uploadRecord = async (fileName, title, speaker, speakers) => {
     throw error;
   }
 };
+
+export const editRecord = async (
+  recordId,
+  title,
+  speaker,
+  speakers,
+  recordTextList
+) => {
+  const data = {
+    recordId: recordId,
+    title: title,
+    speaker: speaker,
+    speakers: speakers,
+    recordTextList: recordTextList,
+  };
+
+  try {
+    const response = await axios.post("/api/edit/record", data, {
+      headers: {
+        "Content-Type": "application/json",
+        accept: "*/*",
+      },
+    });
+    const record = await response.data;
+
+    console.log(record);
+  } catch (error) {
+    console.error("Error uploading record:", error);
+    throw error;
+  }
+};

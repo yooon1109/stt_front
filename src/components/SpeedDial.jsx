@@ -16,15 +16,17 @@ import {
   Typography,
 } from "@mui/material";
 import DialogComponent from "./Dialog";
+import { useNavigate } from "react-router-dom";
 
 const actions = [
   { icon: <FileCopyIcon />, name: "녹음 불러오기" },
-  { icon: <SaveIcon />, name: "Save" },
+  { icon: <SaveIcon />, name: "녹음하기" },
   { icon: <PrintIcon />, name: "Print" },
   { icon: <ShareIcon />, name: "Share" },
 ];
 
 export default function SpeedDialTooltipOpen() {
+  const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
@@ -33,6 +35,11 @@ export default function SpeedDialTooltipOpen() {
 
   const handleDialogOpen = () => setDialogOpen(true);
   const handleDialogClose = () => setDialogOpen(false);
+
+  const handleRecord = () => {
+    navigate("/streaming");
+  };
+
   return (
     <Box sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1300 }}>
       {/* <Backdrop open={open} /> */}
@@ -50,9 +57,15 @@ export default function SpeedDialTooltipOpen() {
             icon={action.icon}
             tooltipTitle={action.name}
             tooltipOpen
-            onClick={
-              action.name === "녹음 불러오기" ? handleDialogOpen : handleClose
-            }
+            onClick={() => {
+              if (action.name === "녹음 불러오기") {
+                handleDialogOpen();
+              } else if (action.name === "녹음하기") {
+                handleRecord();
+              } else {
+                handleClose(); // 기본적인 동작이나 처리
+              }
+            }}
           />
         ))}
       </SpeedDial>

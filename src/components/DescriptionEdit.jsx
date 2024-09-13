@@ -26,7 +26,8 @@ const DescriptionEdit = ({
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault(); // 기본 엔터키 동작 방지
-      onEnterPress();
+      const cursorPosition = textareaRef.current.selectionStart;
+      onEnterPress(cursorPosition);
     }
   };
 
@@ -37,8 +38,8 @@ const DescriptionEdit = ({
   return (
     <div className="p-4 mb-2rounded-md shadow-sm flex items-center">
       <div className="flex-shrink-0">
-        <IconButton aria-label="delete" size="small">
-          <DeleteIcon fontSize="inherit" onClick={handleDelete} />
+        <IconButton aria-label="delete" size="small" onClick={handleDelete}>
+          <DeleteIcon fontSize="inherit" />
         </IconButton>
         <select
           className={`text-lg ${color} bg-transparent border-none outline-none`}

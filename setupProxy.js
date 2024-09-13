@@ -1,11 +1,11 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const { createProxyMiddleware } = require("http-proxy-middleware");
 
-module.exports = function(app) {
-  	app.use(
-    	'/api',									// '/api'로 시작하는 모든 요청은 이 미들웨어를 거침
-    	createProxyMiddleware({
-      		target: 'http://localhost:8081',	// 서버의 포트를 작성
-      		changeOrigin: true,					// 요청 헤더의 호스트 헤더를 대상 서버의 URL로 변경 
-    	})
-  	);
-}
+module.exports = function (app) {
+  app.use(
+    "/api", // '/api'로 시작하는 모든 요청은 이 미들웨어를 거침
+    createProxyMiddleware({
+      target: "http://52.79.215.156:8081/", // 서버의 포트를 작성
+      changeOrigin: true, // 요청 헤더의 호스트 헤더를 대상 서버의 URL로 변경
+    })
+  );
+};

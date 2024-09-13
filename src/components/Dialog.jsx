@@ -192,7 +192,7 @@ const DialogComponent = ({ open, onClose }) => {
               </FormGroup>
             </div>
           </div>
-          <div style={{ margin: "10px" }}>
+          {/* <div style={{ margin: "10px" }}>
             <Typography variant="body1">대화 참여자 이름</Typography>
 
             <Box
@@ -247,7 +247,7 @@ const DialogComponent = ({ open, onClose }) => {
                 />
               </div>
             </Box>
-          </div>
+          </div> */}
         </div>
       </DialogContent>
       <DialogActions>
