@@ -10,7 +10,14 @@ const Streaming = () => {
   const [transferText, setTransferText] = useState([]);
   const audioPlayerRef = useRef(null);
 
-  const recorderControls = useVoiceVisualizer();
+  const handleStartRecording = () => {
+    console.log("Recording started!");
+    startStreaming(); // Call your specific function here
+  };
+
+  const recorderControls = useVoiceVisualizer({
+    onStartRecording: handleStartRecording,
+  });
 
   const {
     // ... (Extracted controls and states, if necessary)
@@ -27,11 +34,11 @@ const Streaming = () => {
     console.log(recordedBlob);
   }, [recordedBlob, error]);
 
-  useEffect(() => {
-    if (isRecordingInProgress) {
-      startStreaming();
-    }
-  }, [isRecordingInProgress]);
+  // useEffect(() => {
+  //   if (isRecordingInProgress) {
+  //     startStreaming();
+  //   }
+  // }, [isRecordingInProgress]);
 
   const startStreaming = () => {
     const eventSource = new EventSource("http://localhost:8081/api/stream");
