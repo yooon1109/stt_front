@@ -4,43 +4,85 @@ import React, { useState, useRef, useEffect } from "react";
 import { useVoiceVisualizer, VoiceVisualizer } from "react-voice-visualizer";
 
 const Streaming = () => {
+  const BUFFER_SIZE = 1024; // 설정할 버퍼 크기
+
   const [chunks, setChunks] = useState([]);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioURL, setAudioURL] = useState(null);
   const [transferText, setTransferText] = useState([]);
   const audioPlayerRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+
+  useEffect(() => {
+    const getToken = async () => {
+      // try {
+      //   const response = await fetch("http://localhost:8081/api/token", {
+      //     method: "GET",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //   });
+      //   const token = await response.text();
+      // } catch (error) {
+      //   console.log(error.message);
+      // }
+    };
+
+    getToken();
+  }, []);
 
   const handleStartRecording = () => {
     console.log("Recording started!");
     startStreaming(); // Call your specific function here
   };
 
-  const recorderControls = useVoiceVisualizer({
-    onStartRecording: handleStartRecording,
-  });
+  const handleStopRecording = () => {
+    console.log("Recording stop");
+    stopRecording();
+  };
 
-  const {
-    // ... (Extracted controls and states, if necessary)
-    recordedBlob,
-    error,
-    audioRef,
-    isRecordingInProgress,
-  } = recorderControls;
+  const startStreaming = async () => {
+    const wsUrl = "ws://localhost:8081/api/audio";
+    const socket = new WebSocket(wsUrl);
 
-  // Get the recorded audio blob
-  useEffect(() => {
-    if (!recordedBlob) return;
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+    };
 
-    console.log(recordedBlob);
-  }, [recordedBlob, error]);
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      audio: true,
+    });
 
-  // useEffect(() => {
-  //   if (isRecordingInProgress) {
-  //     startStreaming();
-  //   }
-  // }, [isRecordingInProgress]);
+    const mediaRecorder = new MediaRecorder(stream);
+    const BUFFER_SIZE = 4096; // 이 값을 원하는 크기로 조정합니다.
 
-  const startStreaming = () => {
+    mediaRecorder.ondataavailable = (event) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        let data = new Uint8Array(e.target.result);
+        while (data.length > BUFFER_SIZE) {
+          const chunk = data.slice(0, BUFFER_SIZE);
+          socket.send(chunk);
+          data = data.slice(BUFFER_SIZE);
+        }
+        if (data.length > 0) {
+          socket.send(data);
+        }
+      };
+      reader.readAsArrayBuffer(event.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      console.log("MediaRecorder stopped");
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.close();
+      }
+    };
+
+    mediaRecorder.start();
+  };
+  const gettranslate = () => {
     const eventSource = new EventSource("http://localhost:8081/api/stream");
 
     eventSource.onmessage = function (event) {
@@ -51,24 +93,6 @@ const Streaming = () => {
       eventSource.close();
       alert("Connection closed");
     };
-  };
-
-  const startRecordings = () => {
-    // navigator.mediaDevices
-    //   .getDisplayMedia({ audio: true, video: true })
-    //   .then((stream) => {
-    //     const recorder = new MediaRecorder(stream);
-    //     setMediaRecorder(recorder);
-    //     recorder.ondataavailable = (event) => {
-    //       if (event.data.size > 0) {
-    //         setChunks((prevChunks) => [...prevChunks, event.data]);
-    //       }
-    //     };
-    //     recorder.start();
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error accessing media devices.", error);
-    //   });
   };
 
   const stopRecording = () => {
@@ -102,10 +126,13 @@ const Streaming = () => {
     }
   };
 
-  const startBoth = () => {
-    startStreaming();
-    startRecordings();
-  };
+  useEffect(() => {
+    // Update VoiceVisualizer's audioRef src if audioURL is updated
+    console.log(audioURL);
+    if (audioURL && audioPlayerRef.current) {
+      audioPlayerRef.current.src = audioURL;
+    }
+  }, [audioURL]);
 
   return (
     <div>
@@ -113,7 +140,7 @@ const Streaming = () => {
       <Toolbar />
       <div className="h-[68px]" />
       <div>
-        <VoiceVisualizer controls={recorderControls} ref={audioRef} />
+        <button onClick={handleStartRecording}>녹음시작</button>
       </div>
       {/* 오디오 플레이어 */}
       <div id="audio-player-container">

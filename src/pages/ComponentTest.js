@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-
+import AudioVisualizer from "components/AudioVisualizer";
 const ComponentTest = () => {
   const textareaRef = useRef(null);
   const msg = "123123";
@@ -37,38 +37,8 @@ const ComponentTest = () => {
   const [selected, setSelected] = useState(speakers[1]);
 
   return (
-    <div className="p-4 mb-2rounded-md shadow-sm flex items-center">
-      <div className="flex-shrink-0">
-        <select
-          className="text-lg ${color} bg-transparent border-none outline-none"
-          value={speakers[speaker]}
-          onChange={(e) => handleSpeakerChange(e.target.selectedIndex)}
-        >
-          {speakers.map((spk, index) => (
-            <option key={index} value={spk}>
-              {spk}
-            </option>
-          ))}
-        </select>
-        <button className="w-full mx-8">Edit</button>
-        <input
-          type="text"
-          className="text-lg ml-2 p-1 border border-gray-300 rounded"
-          value={speakerInput} // input에 입력된 값 표시
-          onChange={handleInputChange} // 사용자가 입력한 값을 업데이트
-        />
-      </div>
-      <div className="flex-1 ml-4">
-        <div className="ml-4 text-gray-700 border border-gray-300">
-          <textarea
-            ref={textareaRef}
-            type="text"
-            value={msg}
-            className="w-full p-2 border-none outline-none bg-transparent resize-none"
-            rows={1}
-          />
-        </div>
-      </div>
+    <div>
+      <AudioVisualizer />
     </div>
   );
 };
