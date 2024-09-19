@@ -1,151 +1,132 @@
 import { AppBar } from "@mui/material";
+import { red } from "@mui/material/colors";
 import Toolbar from "components/Toolbar";
 import React, { useState, useRef, useEffect } from "react";
-import { useVoiceVisualizer, VoiceVisualizer } from "react-voice-visualizer";
+import AudioVisualizer from "components/AudioVisualizer";
+import { VoiceVisualizer, useVoiceVisualizer } from "react-voice-visualizer";
 
 const Streaming = () => {
-  const BUFFER_SIZE = 1024; // 설정할 버퍼 크기
-
-  const [chunks, setChunks] = useState([]);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [audioURL, setAudioURL] = useState(null);
   const [transferText, setTransferText] = useState([]);
-  const audioPlayerRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
-  useEffect(() => {
-    const getToken = async () => {
-      // try {
-      //   const response = await fetch("http://localhost:8081/api/token", {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //   });
-      //   const token = await response.text();
-      // } catch (error) {
-      //   console.log(error.message);
-      // }
-    };
-
-    getToken();
-  }, []);
-
-  const handleStartRecording = () => {
-    console.log("Recording started!");
-    startStreaming(); // Call your specific function here
-  };
-
-  const handleStopRecording = () => {
-    console.log("Recording stop");
-    stopRecording();
-  };
-
-  const startStreaming = async () => {
-    const wsUrl = "ws://localhost:8081/api/audio";
-    const socket = new WebSocket(wsUrl);
-
-    socket.onopen = () => {
-      console.log("WebSocket connection established");
-    };
-
+  const handleRecording = async () => {
     const stream = await navigator.mediaDevices.getDisplayMedia({
       audio: true,
     });
 
+    // MediaRecorder 생성 및 시작
     const mediaRecorder = new MediaRecorder(stream);
-    const BUFFER_SIZE = 4096; // 이 값을 원하는 크기로 조정합니다.
+    mediaRecorderRef.current = mediaRecorder;
+    audioChunksRef.current = [];
 
-    mediaRecorder.ondataavailable = (event) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        let data = new Uint8Array(e.target.result);
-        while (data.length > BUFFER_SIZE) {
-          const chunk = data.slice(0, BUFFER_SIZE);
-          socket.send(chunk);
-          data = data.slice(BUFFER_SIZE);
-        }
-        if (data.length > 0) {
-          socket.send(data);
-        }
-      };
-      reader.readAsArrayBuffer(event.data);
+    const ws = new WebSocket("ws://localhost:8081/api/audio");
+
+    ws.onopen = () => {
+      console.log("open");
     };
 
-    mediaRecorder.onstop = () => {
-      console.log("MediaRecorder stopped");
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.close();
+    mediaRecorder.ondataavailable = async (event) => {
+      // 녹음 중인 오디오 데이터를 audioChunks 배열에 저장
+      const arrayBuffer = await event.data.arrayBuffer();
+      if (ws.readyState === WebSocket.OPEN) {
+        // ws.send(arrayBuffer);
+        audioChunksRef.current.push(event.data);
+      } else {
+        console.warn("WebSocket is not open. Data not sent.");
       }
     };
 
     mediaRecorder.start();
-  };
-  const gettranslate = () => {
-    const eventSource = new EventSource("http://localhost:8081/api/stream");
 
-    eventSource.onmessage = function (event) {
-      setTransferText((prevText) => [...prevText, event.data]);
+    // Stop recording and clean up
+    mediaRecorder.onstop = async () => {
+      // 녹음이 끝난 후 모든 녹음된 오디오 데이터를 Blob으로 결합
+      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      // 녹음된 오디오 데이터를 WebSocket으로 전송
+      const arrayBuffer = await audioBlob.arrayBuffer();
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(arrayBuffer);
+        console.log(arrayBuffer);
+      } else {
+        console.warn("WebSocket is not open. Data not sent.");
+      }
+
+      stream.getTracks().forEach((track) => track.stop());
+      ws.close();
     };
 
-    eventSource.onerror = function () {
-      eventSource.close();
-      alert("Connection closed");
-    };
+    // const eventSource = new EventSource("http://localhost:8081/api/stream");
+
+    // eventSource.onmessage = function (event) {
+    //   const parsedData = JSON.parse(event.data);
+    //   const { seq, alternatives, start_at } = parsedData;
+    //   const text = alternatives[0]?.text || "";
+
+    //   setTransferText((prevText) => {
+    //     // 동일한 seq 값이 있는지 확인
+    //     const existingIndex = prevText.findIndex((item) => item.seq === seq);
+
+    //     if (existingIndex !== -1) {
+    //       // 동일한 seq 값을 가진 메시지가 있다면 덮어쓰기
+    //       const updatedText = [...prevText];
+    //       updatedText[existingIndex] = { seq, text, start_at };
+    //       return updatedText;
+    //     } else {
+    //       // 새 메시지를 추가
+    //       return [...prevText, { seq, text, start_at }];
+    //     }
+    //   });
+    // };
+    // eventSource.onerror = function () {
+    //   eventSource.close();
+    //   alert("Connection closed");
+    // };
   };
 
-  const stopRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-      mediaRecorder.stream.getTracks().forEach((track) => track.stop());
+  const recorderControls = useVoiceVisualizer({
+    onStartRecording: handleRecording,
+  });
 
-      // Send stop signal to the server
-      fetch("http://localhost:8081/api/stop", {
-        method: "POST",
-      })
-        .then(() => {
-          console.log("Recording stopped on server");
-        })
-        .catch((error) => {
-          console.error("Error stopping recording:", error);
-        });
-
-      mediaRecorder.onstop = () => {
-        // 녹음이 완전히 종료된 후 Blob 생성
-        const blob = new Blob(chunks, { type: "audio/webm" });
-        const newAudioURL = window.URL.createObjectURL(blob);
-        setAudioURL(newAudioURL);
-
-        // 오디오 태그에 녹음된 파일을 연결
-        if (audioPlayerRef.current) {
-          audioPlayerRef.current.src = newAudioURL; // ref를 통해 src 업데이트
-          audioPlayerRef.current.controls = true; // 오디오 컨트롤 활성화
-        }
-      };
-    }
-  };
-
-  useEffect(() => {
-    // Update VoiceVisualizer's audioRef src if audioURL is updated
-    console.log(audioURL);
-    if (audioURL && audioPlayerRef.current) {
-      audioPlayerRef.current.src = audioURL;
-    }
-  }, [audioURL]);
+  const {
+    // ... (Extracted controls and states, if necessary)
+    audioRef,
+    recordedBlob,
+    bufferFromRecordedBlob,
+  } = recorderControls;
 
   return (
     <div>
-      <h1>STT Recorder</h1>
       <Toolbar />
-      <div className="h-[68px]" />
-      <div>
-        <button onClick={handleStartRecording}>녹음시작</button>
-      </div>
-      {/* 오디오 플레이어 */}
-      <div id="audio-player-container">
-        <audio id="audio-player" ref={audioPlayerRef}></audio>
-      </div>
+      <div className="h-[68px] m-5 p-8" />
+      <VoiceVisualizer
+        controls={recorderControls}
+        ref={audioRef}
+        width="90%"
+        height={300}
+        speed={3}
+        backgroundColor="white"
+        mainBarColor="black"
+        secondaryBarColor="gray"
+        barWidth={2}
+        gap={2}
+        rounded={true}
+        isControlPanelShown={true}
+        isDownloadAudioButtonShown={false}
+        animateCurrentPick={true}
+        fullscreen={false}
+        onlyRecording={false}
+        isDefaultUIShown={false}
+        defaultMicrophoneIconColor="black"
+        defaultAudioWaveIconColor="gray"
+        isProgressIndicatorShown={true}
+        isProgressIndicatorTimeShown={true}
+        isProgressIndicatorOnHoverShown={true}
+        isProgressIndicatorTimeOnHoverShown={true}
+        isAudioProcessingTextShown={false}
+      />
     </div>
   );
 };

@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const fetchRecords = async () => {
   try {
-    const response = await axios.get("/api/records"); // 프록시 설정에 따라 /api로 시작하는 요청이 http://localhost:8080으로 프록시됨
+    const response = await axios.get("/api/records"); // 프록시 설정에 따라 /api로 시작하는 요청이 프록시됨
     return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);

@@ -1,4 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
+import { stopStreaming } from "apis/StreamApi";
+import Canvas from "./Canvas";
 
 const AudioVisualizer = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -39,7 +41,7 @@ const AudioVisualizer = () => {
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
-      const eventSource = new EventSource("http://localhost:8081/api/stream");
+      const eventSource = new EventSource("/api/stream");
 
       eventSource.onmessage = function (event) {
         const parsedData = JSON.parse(event.data);
@@ -67,13 +69,13 @@ const AudioVisualizer = () => {
         alert("Connection closed");
       };
 
-      mediaRecorder.ondataavailable = (event) => {
+      mediaRecorder.ondataavailable = async (event) => {
         // 녹음 중인 오디오 데이터를 audioChunks 배열에 저장
         audioChunksRef.current.push(event.data);
         console.log(audioChunksRef);
       };
 
-      mediaRecorder.onstop = () => {
+      mediaRecorder.onstop = async () => {
         // 녹음이 끝난 후 오디오 데이터를 Blob으로 결합
         const audioBlob = new Blob(audioChunksRef.current, {
           type: "audio/wav",
@@ -98,9 +100,6 @@ const AudioVisualizer = () => {
       // 소스를 AnalyserNode에 연결
       source.connect(analyser);
 
-      // 캔버스에 시각화 시작
-      visualize();
-
       mediaRecorder.start();
     } catch (err) {
       console.error("Error accessing audio stream:", err);
@@ -109,6 +108,7 @@ const AudioVisualizer = () => {
 
   const stopRecording = () => {
     cancelAnimationFrame(animationRef.current);
+    stopStreaming();
 
     if (audioContextRef.current) {
       audioContextRef.current.close();
@@ -119,73 +119,6 @@ const AudioVisualizer = () => {
     }
   };
 
-  const visualize = () => {
-    const canvas = canvasRef.current;
-    const canvasContext = canvas.getContext("2d");
-    const analyser = analyserRef.current;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    const WIDTH = canvas.width;
-    const HEIGHT = canvas.height;
-
-    const blockWidth = 2; // Width of each block
-    const blockSpacing = 0.5; // Gap between blocks (smaller value)
-    const scrollSpeed = 12; // Speed of horizontal scrolling (slower)
-
-    const draw = () => {
-      analyser.getByteFrequencyData(dataArray);
-
-      // Calculate average amplitude
-      let sum = 0;
-      for (let i = 0; i < dataArray.length; i++) {
-        sum += dataArray[i];
-      }
-      const averageAmplitude = sum / dataArray.length;
-
-      // Map amplitude to block height
-      const blockHeight =
-        averageAmplitude > 10 ? (averageAmplitude / 255) * HEIGHT : 1;
-
-      const now = Date.now();
-      // Check if enough time has passed since the last block creation
-      if (now - lastBlockCreationRef.current > blockCreationInterval) {
-        blocksRef.current.push({
-          x: WIDTH / 2 - blockWidth / 2, // Start position of the new block in the center
-          height: blockHeight,
-        });
-        lastBlockCreationRef.current = now; // Update last block creation time
-      }
-
-      canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
-
-      // Draw existing blocks
-      blocksRef.current.forEach((block) => {
-        const blockCenterY = HEIGHT / 2; // Center of the canvas vertically
-        canvasContext.fillStyle = "#000000";
-
-        // Draw the block above and below the center
-        canvasContext.fillRect(
-          block.x,
-          blockCenterY - block.height / 2, // Top edge
-          blockWidth,
-          block.height // Full height
-        );
-
-        block.x -= (blockWidth + blockSpacing) / scrollSpeed; // Adjust for block width and spacing
-      });
-
-      // Remove blocks that have scrolled off the canvas
-      blocksRef.current = blocksRef.current.filter(
-        (block) => block.x + blockWidth + blockSpacing > 0
-      );
-
-      animationRef.current = requestAnimationFrame(draw);
-    };
-
-    draw();
-  };
-
   return (
     <div>
       <button
@@ -194,8 +127,7 @@ const AudioVisualizer = () => {
       >
         {isRecording ? "녹음 중지" : "녹음 시작"}
       </button>
-
-      <canvas ref={canvasRef} width="600" height="200" />
+      <Canvas analyserRef={analyserRef} />
       {/* 녹음된 오디오가 있을 경우 재생 가능 */}
       {audioURL && (
         <div>
