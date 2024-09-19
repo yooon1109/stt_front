@@ -32,7 +32,7 @@ const AudioVisualizer = () => {
   const startRecording = async () => {
     try {
       // 디바이스 오디오 스트림 가져오기
-      const stream = await navigator.mediaDevices.getDisplayMedia({
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
       });
 
@@ -41,7 +41,7 @@ const AudioVisualizer = () => {
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
-      const eventSource = new EventSource("/api/stream");
+      const eventSource = new EventSource("http://localhost:8081/api/stream");
 
       eventSource.onmessage = function (event) {
         const parsedData = JSON.parse(event.data);

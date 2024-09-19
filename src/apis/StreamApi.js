@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const stopStreaming = async () => {
   try {
-    await fetch("/api/stop", {
+    await fetch("http://localhost:8081/api/stop", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
