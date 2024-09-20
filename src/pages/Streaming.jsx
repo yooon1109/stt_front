@@ -1,43 +1,48 @@
-import { AppBar } from "@mui/material";
+import { AppBar, Button, IconButton } from "@mui/material";
 import { red } from "@mui/material/colors";
 import Toolbar from "components/Toolbar";
 import React, { useState, useRef, useEffect } from "react";
 import AudioVisualizer from "components/AudioVisualizer";
 import { VoiceVisualizer, useVoiceVisualizer } from "react-voice-visualizer";
 import { stopStreaming } from "apis/StreamApi";
-
+import { Box } from "@mui/joy";
+import { CircularProgress } from "@mui/material";
 const Streaming = () => {
   const [audioUrl, setAudioUrl] = useState(null); // 녹음된 파일의 URL을 저장
-  const [transferText, setTransferText] = useState([]);
+  const [transferText, setTransferText] = useState([
+    { seq: 0, start_at: 123, text: "123123" },
+    { seq: 1, start_at: 345, text: "djWjdnwjWjrn" },
+  ]);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-    });
+    // const stream = await navigator.mediaDevices.getUserMedia({
+    //   audio: true,
+    // });
 
-    // MediaRecorder 생성 및 시작
-    const mediaRecorder = new MediaRecorder(stream);
-    mediaRecorderRef.current = mediaRecorder;
-    audioChunksRef.current = [];
+    // // MediaRecorder 생성 및 시작
+    // const mediaRecorder = new MediaRecorder(stream);
+    // mediaRecorderRef.current = mediaRecorder;
+    // audioChunksRef.current = [];
 
-    mediaRecorder.ondataavailable = async (event) => {
-      // 녹음 중인 오디오 데이터를 audioChunks 배열에 저장
-      // const arrayBuffer = await event.data.arrayBuffer()
-      audioChunksRef.current.push(event.data);
-    };
+    // mediaRecorder.ondataavailable = async (event) => {
+    //   // 녹음 중인 오디오 데이터를 audioChunks 배열에 저장
+    //   // const arrayBuffer = await event.data.arrayBuffer()
+    //   audioChunksRef.current.push(event.data);
+    // };
 
-    mediaRecorder.start();
+    // mediaRecorder.start();
 
-    // Stop recording and clean up
-    mediaRecorder.onstop = async () => {
-      // 녹음이 끝난 후 모든 녹음된 오디오 데이터를 Blob으로 결합
-      const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      setAudioUrl(audioUrl); // Blob URL을 상태에 저장
-      stream.getTracks().forEach((track) => track.stop());
-    };
+    // // Stop recording and clean up
+    // mediaRecorder.onstop = async () => {
+    //   // 녹음이 끝난 후 모든 녹음된 오디오 데이터를 Blob으로 결합
+    //   const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+    //   const audioUrl = URL.createObjectURL(audioBlob);
+    //   setAudioUrl(audioUrl); // Blob URL을 상태에 저장
+    //   stream.getTracks().forEach((track) => track.stop());
+    // };
 
     const eventSource = new EventSource("http://localhost:8081/api/stream");
 
@@ -90,16 +95,20 @@ const Streaming = () => {
     bufferFromRecordedBlob,
   } = recorderControls;
 
+  const handleSave = () => {
+    setIsSaving(true);
+  };
+
   return (
     <div>
-      <Toolbar />
-      <div className="h-[68px] m-5 p-8" />
-      {audioUrl && (
+      <Toolbar isDetail={true} title={"record"} />
+      <div className="h-[68px]" />
+      {/* {audioUrl && (
         <div>
           <h2>Recorded Audio:</h2>
           <audio controls src={audioUrl} />
         </div>
-      )}
+      )} */}
       <div>
         <VoiceVisualizer
           controls={recorderControls}
@@ -128,12 +137,30 @@ const Streaming = () => {
           isAudioProcessingTextShown={false}
         />
       </div>
-      <div className="scroll h-[50vh] overflow-y-auto p-4 shadow-lg">
+      {isSaving && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.1)",
+            zIndex: 1,
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
+      <div className="scroll h-[47vh] overflow-y-auto p-4 shadow-lg">
         <ul className="space-y-4 p-4">
           {transferText.map((item, index) => (
             <li key={index} className="flex justify-right">
               <div
-                className="p-3 max-w-lg bg-blue-100 text-black
+                className="p-3 max-w-lg bg-blue-100 text-black-200
               rounded-xl relative shadow-md"
               >
                 {item.text}
@@ -146,6 +173,11 @@ const Streaming = () => {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="absolute bottom-4 right-4">
+        <Button onClick={handleSave}>
+          <div className="text-gray-500">save</div>
+        </Button>
       </div>
     </div>
   );

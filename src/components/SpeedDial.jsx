@@ -17,12 +17,15 @@ import {
 } from "@mui/material";
 import DialogComponent from "./Dialog";
 import { useNavigate } from "react-router-dom";
+import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
+import GraphicEqIcon from "@mui/icons-material/GraphicEq";
+import MicIcon from "@mui/icons-material/Mic";
+import VideoCallIcon from "@mui/icons-material/VideoCall";
 
 const actions = [
-  { icon: <FileCopyIcon />, name: "녹음 불러오기" },
-  { icon: <SaveIcon />, name: "녹음하기" },
-  { icon: <PrintIcon />, name: "Print" },
-  { icon: <ShareIcon />, name: "Share" },
+  { icon: <GraphicEqIcon />, name: "녹음 불러오기" },
+  { icon: <MicIcon />, name: "녹음하기" },
+  { icon: <VideoCallIcon />, name: "화면녹음" },
 ];
 
 export default function SpeedDialTooltipOpen() {

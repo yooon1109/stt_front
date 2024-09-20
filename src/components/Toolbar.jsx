@@ -15,7 +15,7 @@ const Toolbar = ({ isDetail, isEdit, title, onTitleChange }) => {
   const theme = useTheme();
 
   const handleBackClick = () => {
-    window.history.back();
+    window.location.href = "/main";
   };
   return (
     <AppBar

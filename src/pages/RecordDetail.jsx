@@ -52,7 +52,7 @@ const DetailPage = () => {
     };
 
     loadRecordDetail();
-  }, []);
+  }, [id]);
 
   if (error) {
     return <div>Error: {error}</div>;
