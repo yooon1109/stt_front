@@ -28,6 +28,7 @@ const RecordEdit = () => {
   const [audioUrl, setAudioUrl] = useState(null);
   const [title, setTitle] = useState(null);
   const [recordName, setRecordName] = useState(null);
+  const [duration, setDuration] = useState(null);
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [error, setError] = useState(null); // 에러 상태
   const [open, setOpen] = useState(false); // 다이얼로그 열림 상태 관리
@@ -50,6 +51,7 @@ const RecordEdit = () => {
     setRecordText(record.recordTextList);
     setSpeakers(record.speakers);
     setTitle(record.title);
+    setDuration(record.duration);
     setLoading(false);
     // const loadRecordDetail = async () => {
     //   try {
@@ -177,7 +179,9 @@ const RecordEdit = () => {
       <div className="h-[68px]" />
 
       {/* 오디오 플레이어 */}
-      {audioUrl && <Player audioSrc={audioUrl} recordName={recordName} />}
+      {audioUrl && (
+        <Player audioSrc={audioUrl} recordName={recordName} time={duration} />
+      )}
       <div className="ml-6 mr-6 pr-4 w-[100hv] flex justify-between">
         <div className="m-3 mb-0 items-center">
           참여자들 : {speakers.join(", ")}
