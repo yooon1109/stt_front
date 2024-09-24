@@ -6,7 +6,16 @@ import AudioVisualizer from "components/AudioVisualizer";
 import { VoiceVisualizer, useVoiceVisualizer } from "react-voice-visualizer";
 import { stopStreaming } from "apis/StreamApi";
 import { Box } from "@mui/joy";
-import { CircularProgress } from "@mui/material";
+import AudioFileIcon from "@mui/icons-material/AudioFile";
+import DialogComponent from "components/Dialog";
+import {
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+
 const Streaming = () => {
   const [audioUrl, setAudioUrl] = useState(null); // 녹음된 파일의 URL을 저장
   const [transferText, setTransferText] = useState([
@@ -16,34 +25,9 @@ const Streaming = () => {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleRecording = async () => {
-    // const stream = await navigator.mediaDevices.getUserMedia({
-    //   audio: true,
-    // });
-
-    // // MediaRecorder 생성 및 시작
-    // const mediaRecorder = new MediaRecorder(stream);
-    // mediaRecorderRef.current = mediaRecorder;
-    // audioChunksRef.current = [];
-
-    // mediaRecorder.ondataavailable = async (event) => {
-    //   // 녹음 중인 오디오 데이터를 audioChunks 배열에 저장
-    //   // const arrayBuffer = await event.data.arrayBuffer()
-    //   audioChunksRef.current.push(event.data);
-    // };
-
-    // mediaRecorder.start();
-
-    // // Stop recording and clean up
-    // mediaRecorder.onstop = async () => {
-    //   // 녹음이 끝난 후 모든 녹음된 오디오 데이터를 Blob으로 결합
-    //   const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
-    //   const audioUrl = URL.createObjectURL(audioBlob);
-    //   setAudioUrl(audioUrl); // Blob URL을 상태에 저장
-    //   stream.getTracks().forEach((track) => track.stop());
-    // };
-
     const eventSource = new EventSource("http://localhost:8081/api/stream");
 
     eventSource.onmessage = function (event) {
@@ -88,27 +72,25 @@ const Streaming = () => {
     onStopRecording: handleRecordStop,
   });
 
-  const {
-    // ... (Extracted controls and states, if necessary)
-    audioRef,
-    recordedBlob,
-    bufferFromRecordedBlob,
-  } = recorderControls;
+  const { audioRef, recordedBlob, bufferFromRecordedBlob, audioSrc, duration } =
+    recorderControls;
 
   const handleSave = () => {
-    setIsSaving(true);
+    if (!recordedBlob) {
+      alert("파일이 없습니다.");
+    } else {
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
   };
 
   return (
     <div>
       <Toolbar isDetail={true} title={"record"} />
       <div className="h-[68px]" />
-      {/* {audioUrl && (
-        <div>
-          <h2>Recorded Audio:</h2>
-          <audio controls src={audioUrl} />
-        </div>
-      )} */}
       <div>
         <VoiceVisualizer
           controls={recorderControls}
@@ -179,6 +161,13 @@ const Streaming = () => {
           <div className="text-gray-500">save</div>
         </Button>
       </div>
+      {/* Dialog for saving the recorded audio */}
+      <DialogComponent
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+        recordedBlob={recordedBlob}
+        duration={duration}
+      ></DialogComponent>
     </div>
   );
 };

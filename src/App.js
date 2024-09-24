@@ -6,6 +6,7 @@ import ComponentTest from "pages/ComponentTest";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "theme";
 import Streaming from "pages/Streaming";
+import Recording from "pages/Recording";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/details/:id" element={<DetailPage />} />
           <Route path="/edit/:id" element={<RecordEdit />} />
           <Route path="/streaming" element={<Streaming />} />
+          <Route path="/recording" element={<Recording />} />
         </Routes>
       </Router>
     </ThemeProvider>

@@ -29,6 +29,7 @@ const DetailPage = () => {
   const [recordName, setRecordName] = useState(null);
   const [loading, setLoading] = useState(true); // 로딩 상태
   const [error, setError] = useState(null); // 에러 상태
+  const [duration, setDuration] = useState(null);
 
   const handleEditClick = () => {
     navigate(`/edit/${id}`, { state: { record } });
@@ -43,6 +44,7 @@ const DetailPage = () => {
         setRecordName(data.recordName);
         setRecordText(data.recordTextList);
         setSpeakers(data.speakers);
+        setDuration(data.duration);
         console.log(data);
       } catch (error) {
         setError(error.message);
@@ -69,7 +71,12 @@ const DetailPage = () => {
       <div className="h-[68px]" />
 
       {/* 오디오 플레이어 */}
-      <Player audioSrc={audioUrl} recordName={recordName} isLoading={loading} />
+      <Player
+        audioSrc={audioUrl}
+        recordName={recordName}
+        isLoading={loading}
+        time={duration}
+      />
 
       <div className="ml-6 mr-6 pr-4 w-[100hv] flex justify-between">
         <div className="m-3 mb-0">

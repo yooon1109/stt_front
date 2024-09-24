@@ -3,7 +3,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import { Skeleton, CircularProgress } from "@mui/material";
 
-const Player = ({ audioSrc, recordName, isLoading }) => {
+const Player = ({ audioSrc, recordName, isLoading, time }) => {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -23,7 +23,11 @@ const Player = ({ audioSrc, recordName, isLoading }) => {
   };
 
   const handleLoadedMetadata = () => {
-    setDuration(audioRef.current.duration);
+    if (time) {
+      setDuration(time);
+    } else {
+      setDuration(audioRef.current.duration);
+    }
   };
 
   const formatTime = (time) => {

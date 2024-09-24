@@ -6,7 +6,7 @@ const theme = createTheme({
       main: "#C3DDFD", // 주 색상 (primary)
     },
     secondary: {
-      main: "#a855f7", // 보조 색상 (secondary)
+      main: "#082f49", // 보조 색상 (secondary)
     },
     background: {
       default: "#F4EEFF", // 배경 색상

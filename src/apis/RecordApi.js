@@ -35,11 +35,12 @@ export const fetchRecordDetail = async (id) => {
       const byteArray = new Uint8Array(byteNumbers);
 
       // Blob으로 변환
-      const blob = new Blob([byteArray], { type: "audio/mpeg" });
+      const blob = new Blob([byteArray], { type: `${data.recordType}` });
 
       // Blob을 URL로 변환
       const url = URL.createObjectURL(blob);
 
+      console.log(data.recordType);
       data.fileData = url;
     }
 
@@ -50,14 +51,20 @@ export const fetchRecordDetail = async (id) => {
 };
 
 // 서버에 파일 업로드 및 기타 데이터를 전송하는 함수
-export const uploadRecord = async (fileName, title, speaker, speakers) => {
+export const uploadRecord = async (
+  file,
+  title,
+  speaker,
+  speakers,
+  duration
+) => {
   const formData = new FormData();
   formData.append("recordId", ""); // 빈 문자열로 채우거나 적절한 값으로 수정
   formData.append("title", title);
   formData.append("speaker", speaker); // 빈 문자열로 채우거나 적절한 값으로 수정
-  formData.append("file", fileName); // 선택된 파일을 추가
+  formData.append("file", file); // 선택된 파일을 추가
   formData.append("speakers", speakers.join(",")); // 배열을 쉼표로 구분된 문자열로 변환
-
+  formData.append("duration", duration);
   // FormData의 내용을 출력하기
   formData.forEach((value, key) => {
     console.log(`${key}: ${value}`);

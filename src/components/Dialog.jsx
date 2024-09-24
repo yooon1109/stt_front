@@ -15,12 +15,12 @@ import {
   Checkbox,
   CircularProgress,
 } from "@mui/material";
-import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
+import AudioFileIcon from "@mui/icons-material/AudioFile";
 import CloseIcon from "@mui/icons-material/Close";
 import StyledChip from "./StyledChip";
 import { uploadRecord } from "apis/RecordApi";
 
-const DialogComponent = ({ open, onClose }) => {
+const DialogComponent = ({ open, onClose, recordedBlob, duration }) => {
   const navigate = useNavigate();
 
   const [fileName, setFileName] = useState("");
@@ -73,17 +73,30 @@ const DialogComponent = ({ open, onClose }) => {
 
   const handleConfirm = async () => {
     try {
+      let currentFile = file;
       if (!fileName) {
         console.error("파일이 선택되지 않았습니다.");
       }
+      if (recordedBlob) {
+        currentFile = new File([recordedBlob], `${title}.mp3`, {
+          type: "audio/mpeg",
+        });
+      }
+
       if (!title) {
         console.error("제목을 입력해주세요");
       } else {
         setLoading(true); // 로딩 시작
 
-        const id = await uploadRecord(file, title, speaker, chipData); // 파일, 제목 및 Chip 데이터를 API로 전송
+        const id = await uploadRecord(
+          currentFile,
+          title,
+          speaker,
+          chipData,
+          duration
+        ); // 파일, 제목 및 Chip 데이터를 API로 전송
         navigate(`/details/${id}`);
-        // onClose(); // 요청 성공 후 다이얼로그 닫기
+        onClose(); // 요청 성공 후 다이얼로그 닫기
       }
     } catch (error) {
       console.error("요청 처리 중 오류 발생:", error);
@@ -99,7 +112,7 @@ const DialogComponent = ({ open, onClose }) => {
       maxWidth={false}
       PaperProps={{
         sx: {
-          width: "50%",
+          width: "40%",
           maxWidth: "none",
           margin: "auto", // 항상 화면 가운데 위치
         },
@@ -132,23 +145,37 @@ const DialogComponent = ({ open, onClose }) => {
           </Box>
         )}
         <div style={{ width: "85%" }}>
-          <div style={{ margin: "10px" }}>
-            <Typography variant="body1" sx={{ marginBottom: "10px" }}>
-              파일 선택
-            </Typography>
-            <input
-              type="file"
-              id="fileInput"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            <label htmlFor="fileInput">
-              <RecordVoiceOverIcon />
-              {fileName && (
-                <span style={{ marginLeft: "8px" }}>{fileName}</span>
-              )}
-            </label>
-          </div>
+          {!recordedBlob ? (
+            <div style={{ margin: "10px" }}>
+              <Typography variant="body1" sx={{ marginBottom: "10px" }}>
+                파일 선택
+              </Typography>
+              <input
+                type="file"
+                id="fileInput"
+                accept=".mp3,.wav,video/*,.mp4"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              <label htmlFor="fileInput">
+                <AudioFileIcon />
+                {fileName && (
+                  <span style={{ marginLeft: "8px" }}>{fileName}</span>
+                )}
+              </label>
+            </div>
+          ) : (
+            <div style={{ margin: "10px" }}>
+              <Typography variant="body1" sx={{ marginBottom: "10px" }}>
+                녹음 파일
+              </Typography>
+              <p>
+                <AudioFileIcon /> recorded_audio.wav
+              </p>
+              {/* <p>Size: {(recordedBlob.size / 1024).toFixed(2)} KB</p> */}
+            </div>
+          )}
+
           <div style={{ margin: "10px" }}>
             <Typography variant="body1">제목</Typography>
             <TextField
@@ -251,10 +278,10 @@ const DialogComponent = ({ open, onClose }) => {
         </div>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="primary">
+        <Button onClick={handleClose} color="secondary">
           닫기
         </Button>
-        <Button onClick={handleConfirm} color="primary">
+        <Button onClick={handleConfirm} color="secondary">
           확인
         </Button>
       </DialogActions>
