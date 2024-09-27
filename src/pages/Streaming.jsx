@@ -2,7 +2,6 @@ import { AppBar, Button, IconButton } from "@mui/material";
 import { red } from "@mui/material/colors";
 import Toolbar from "components/Toolbar";
 import React, { useState, useRef, useEffect } from "react";
-import AudioVisualizer from "components/AudioVisualizer";
 import { VoiceVisualizer, useVoiceVisualizer } from "react-voice-visualizer";
 import { stopStreaming } from "apis/StreamApi";
 import { Box } from "@mui/joy";
@@ -18,10 +17,7 @@ import {
 
 const Streaming = () => {
   const [audioUrl, setAudioUrl] = useState(null); // 녹음된 파일의 URL을 저장
-  const [transferText, setTransferText] = useState([
-    { seq: 0, start_at: 123, text: "123123" },
-    { seq: 1, start_at: 345, text: "djWjdnwjWjrn" },
-  ]);
+  const [transferText, setTransferText] = useState([]);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -72,8 +68,7 @@ const Streaming = () => {
     onStopRecording: handleRecordStop,
   });
 
-  const { audioRef, recordedBlob, bufferFromRecordedBlob, audioSrc, duration } =
-    recorderControls;
+  const { audioRef, recordedBlob, duration } = recorderControls;
 
   const handleSave = () => {
     if (!recordedBlob) {

@@ -46,18 +46,6 @@ const Canvas = ({ analyserRef }) => {
 
       canvasContext.clearRect(0, 0, WIDTH, HEIGHT);
 
-      //   // 항상 1px 높이로 채워지는 기본 블록
-      //   for (let x = 0; x < WIDTH; x += blockWidth + blockSpacing) {
-      //     const blockCenterY = HEIGHT / 2;
-      //     canvasContext.fillStyle = "#000000"; // 1px 높이 블록을 구분하기 위한 색상
-      //     canvasContext.fillRect(
-      //       x,
-      //       blockCenterY - 0.5, // 중심에서 위아래로 1px만큼 그리기
-      //       blockWidth,
-      //       1 // 높이 1px
-      //     );
-      //   }
-
       blocksRef.current.forEach((block) => {
         const blockCenterY = HEIGHT / 2;
         canvasContext.fillStyle = "#000000";

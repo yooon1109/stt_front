@@ -39,6 +39,10 @@ export default function SpeedDialTooltipOpen() {
     navigate("/streaming");
   };
 
+  const handleMediaRecord = () => {
+    navigate("/recording");
+  };
+
   return (
     <Box sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1300 }}>
       {/* <Backdrop open={open} /> */}
@@ -61,6 +65,8 @@ export default function SpeedDialTooltipOpen() {
                 handleDialogOpen();
               } else if (action.name === "녹음하기") {
                 handleRecord();
+              } else if (action.name === "화면녹음") {
+                handleMediaRecord();
               } else {
                 handleClose(); // 기본적인 동작이나 처리
               }

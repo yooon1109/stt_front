@@ -64,7 +64,9 @@ export const uploadRecord = async (
   formData.append("speaker", speaker); // 빈 문자열로 채우거나 적절한 값으로 수정
   formData.append("file", file); // 선택된 파일을 추가
   formData.append("speakers", speakers.join(",")); // 배열을 쉼표로 구분된 문자열로 변환
-  formData.append("duration", duration);
+  if (duration) {
+    formData.append("duration", duration);
+  }
   // FormData의 내용을 출력하기
   formData.forEach((value, key) => {
     console.log(`${key}: ${value}`);

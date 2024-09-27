@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import AudioVisualizer from "components/AudioVisualizer";
+import AudioRecorder from "components/AudioRecorder";
 const ComponentTest = () => {
   const textareaRef = useRef(null);
   const msg = "123123";
@@ -38,7 +38,7 @@ const ComponentTest = () => {
 
   return (
     <div>
-      <AudioVisualizer />
+      <AudioRecorder />
     </div>
   );
 };

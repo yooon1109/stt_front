@@ -105,7 +105,6 @@ const RecordEdit = () => {
         i === index ? { ...item, spk: speaker } : item
       )
     );
-    console.log(recordText);
   };
 
   const handleEnterPress = (index, cursorPosition) => {
