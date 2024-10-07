@@ -53,23 +53,6 @@ const RecordEdit = () => {
     setTitle(record.title);
     setDuration(record.duration);
     setLoading(false);
-    // const loadRecordDetail = async () => {
-    //   try {
-    //     const data = await fetchRecordDetail(id);
-    //     setRecord(data);
-    //     setAudioUrl(data.fileData);
-    //     setRecordName(data.recordName);
-    //     setRecordText(data.recordTextList);
-    //     setSpeakers(data.speakers);
-    //     console.log(data);
-    //   } catch (error) {
-    //     setError(error.message);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-
-    // loadRecordDetail();
   }, []);
 
   const handleSave = async () => {};
